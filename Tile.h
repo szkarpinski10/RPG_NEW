@@ -13,33 +13,19 @@ public:
         : symbol(s), walkable(w), occupant(nullptr) {}
 
 
-    char getSymbol() const {
-        return symbol;
-    }
+    char getSymbol() const {return symbol;}
 
-    bool isWalkable() const {
-        return walkable;
-    }
+    bool isWalkable() const {return walkable;}
 
-    bool hasOccupant() const {
-        return occupant != nullptr;
-    }
+    bool hasOccupant() const {return occupant != nullptr;}
 
-    Character* getOccupant() const {
-        return occupant;
-    }
+    Character* getOccupant() const {return occupant;}
 
-    bool canEnter() const {
-        return walkable && occupant == nullptr;
-    }
+    bool canEnter() const {return walkable && occupant == nullptr;}
 
-    void setOccupant(Character* character) {
-        occupant = character;
-    }
+    void setOccupant(Character* character) {occupant = character;}
 
-    void clearOccupant() {
-        occupant = nullptr;
-    }
+    void clearOccupant() {occupant = nullptr;}
 
     void setSymbol(char s) {
         symbol = s;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Character.h"
+#include "Map.h"
 #include <cstdlib>
 
 class Enemy : public Character {
@@ -18,27 +19,34 @@ public:
         return expReward;
     }
 
-    void randomMove() {
-        int direction = rand() % 5;
+    void randomMove(Map& map) {
+    int dx = 0;
+    int dy = 0;
 
-        if (direction == 0) {
-            move(0, -1);
-        }
+    int direction = rand() % 5;
 
-        if (direction == 1) {
-            move(0, 1);
-        }
-
-        if (direction == 2) {
-            move(-1, 0);
-        }
-
-        if (direction == 3) {
-            move(1, 0);
-        }
-        if(direction == 4){
-            move(0,0);
-        }
+    if (direction == 0) {
+        dy = -1;
     }
+
+    else if (direction == 1) {
+        dy = 1;
+    }
+
+    else if (direction == 2) {
+        dx = -1;
+    }
+
+    else if (direction == 3) {
+        dx = 1;
+    }
+
+    int newX = x + dx;
+    int newY = y + dy;
+
+    map.moveCharacter(x, y, newX, newY);
+}
+ 
+
 };
 

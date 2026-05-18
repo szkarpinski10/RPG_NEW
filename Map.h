@@ -3,15 +3,15 @@
 
 class Map{
 private:
-    static const int WIDTH=15;
+    static const int WIDTH=25;
     static const int HEIGHT=15;
     Tile tiles[HEIGHT][WIDTH];
 
 public:
     Map();
 
-    int getWidth() const;
-    int getHeight() const;
+    int getWidth() const {return WIDTH;}
+    int getHeight() const {return HEIGHT;}
 
     void generate();
     void display() const;
