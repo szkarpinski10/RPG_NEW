@@ -7,8 +7,8 @@
 #include <ctime>
 
 int main() {
-    
-    srand(time(0));
+        srand(time(0));
+        std::cout<<"test";
     Menu menu;
     int choice = menu.showMenuSfml();
 
