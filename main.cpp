@@ -7,9 +7,10 @@
 #include <ctime>
 
 int main() {
+    
     srand(time(0));
     Menu menu;
-    int choice = menu.showMenu();
+    int choice = menu.showMenuSfml();
 
     if (choice == 1) {
         

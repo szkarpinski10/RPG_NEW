@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <SFML/Graphics.hpp>
 
 class Menu{
 public:
@@ -8,4 +9,7 @@ public:
 
     int showMenu();
     int chooseClass();
+
+    //smfl
+    int showMenuSfml();
 };
