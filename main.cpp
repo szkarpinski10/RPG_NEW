@@ -1,22 +1,27 @@
+#include <iostream>
+#include <ctime>
+#include <cstdlib>
+#include <SFML/Graphics.hpp>
 #include "Menu.h"
-#include "Game.h"
+#include "Player.h"   
 #include "Warrior.h"
 #include "Mage.h"
 #include "Rogue.h"
+#include "Game.h"
 
-#include <ctime>
+int main(){
+sf::RenderWindow window(sf::VideoMode(sf::Vector2u(1600, 900)), "RPG Gra");
 
-int main() {
-        srand(time(0));
-        std::cout<<"test";
     Menu menu;
-    int choice = menu.showMenuSfml();
+    
+    int choice = menu.showMenu(window);
 
-    if (choice == 1) {
+    if (choice == 1 && window.isOpen()) {
         
-        int classChoice = menu.chooseClass();
+        // 3. Przekazujemy to samo okno do funkcji chooseClass
+        int classChoice = menu.chooseClass(window);
 
-        Player* player;
+        Player* player = nullptr;
         if (classChoice == 1) {
             player = new Warrior();
         } else if (classChoice == 2) {
@@ -25,10 +30,14 @@ int main() {
             player = new Rogue();
         }
 
-        Game game(player);
-        game.start();
+        // 4. Odpalamy Twoją dotychczasową grę
+        if (window.isOpen()) {
+            Game game(player);
+            game.start(); 
+        }
+
+        delete player;
     }
-   
 
     return 0;
 }
