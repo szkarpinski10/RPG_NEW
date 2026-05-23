@@ -21,6 +21,9 @@ public:
     int getExpToNextLevel() const {return expToNextLevel;}
     bool isAbilityUsed() const { return abilityUsed;}
     
+    void setX(int newX) { x = newX; }
+    void setY(int newY) { y = newY; }
+
     void gainExp(int amount){
         exp+=amount;
         if(exp>=expToNextLevel){

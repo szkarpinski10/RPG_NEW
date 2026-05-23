@@ -4,7 +4,7 @@
 
 Menu::Menu() {
     if (!font.openFromFile("PressStart2P-Regular.ttf")) {
-        std::cout << "Blad czcionki! Upewnij sie, ze plik .ttf jest w odpowiednim folderze." << std::endl;
+        std::cout << "blad czczionki" << std::endl;
     }
 }
 
@@ -37,17 +37,17 @@ int Menu::showMenu(sf::RenderWindow& window) {
                     sf::Vector2f clickPos = window.mapPixelToCoords(mousePressed->position);
 
                     if (startText.getGlobalBounds().contains(clickPos)) {
-                        return 1; // START GRY
+                        return 1; 
                     }
                     if (quitText.getGlobalBounds().contains(clickPos)) {
                         window.close();
-                        return 2; // WYJŚCIE
+                        return 2; 
                     }
                 }
             }
         }
 
-        // 2. HOVER (Zmiana koloru po najechaniu - to musi być poza eventami, żeby było płynne)
+        
         sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
         if (startText.getGlobalBounds().contains(mousePos)) {

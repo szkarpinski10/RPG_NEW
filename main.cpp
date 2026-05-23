@@ -33,7 +33,7 @@ sf::RenderWindow window(sf::VideoMode(sf::Vector2u(1600, 900)), "RPG Gra");
         // 4. Odpalamy Twoją dotychczasową grę
         if (window.isOpen()) {
             Game game(player);
-            game.start(); 
+            game.start(window); 
         }
 
         delete player;

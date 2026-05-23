@@ -3,8 +3,8 @@
 
 class Map{
 private:
-    static const int WIDTH=25;
-    static const int HEIGHT=15;
+    static const int WIDTH=50;
+    static const int HEIGHT=28;
     Tile tiles[HEIGHT][WIDTH];
 
 public:
