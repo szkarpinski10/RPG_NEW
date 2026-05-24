@@ -35,5 +35,31 @@ void HUD::draw(sf::RenderWindow& window, const Player* player, sf::Clock& specia
     hudText->setPosition({hudX +10.f, hudY+44.f});
     window.draw(*hudText);
 
-    
+   sf::RectangleShape specialAbilityBar({hudWidth,hudHeight});
+   specialAbilityBar.setPosition({hudX,hudY+80.f});
+
+  if (!player->isAbilityUsed()) {
+    specialAbilityBar.setFillColor(sf::Color(0, 120, 255));
+    window.draw(specialAbilityBar); 
+    hudText->setString("ABILITY READY");
+    hudText->setPosition({hudX + 10.f, hudY + 84.f});
+    window.draw(*hudText);
+}
+   else{
+    float elapsedAbilityTime = specialAbilityClock.getElapsedTime().asSeconds();
+    float timeLeft = 30.0f - elapsedAbilityTime; 
+        if (timeLeft < 0) timeLeft = 0;
+
+    specialAbilityBar.setFillColor(sf::Color(70, 70, 70)); // Szary
+    window.draw(specialAbilityBar);
+    char timeStr[10];
+        snprintf(timeStr, sizeof(timeStr), "%.1fs", timeLeft);
+
+        hudText->setString("COOLDOWN: " + std::string(timeStr));
+        hudText->setPosition({hudX + 10.f, hudY + 84.f});
+        window.draw(*hudText);
+
+
+   }
+
 }

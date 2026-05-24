@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Map.h"
 #include "Character.h"
+#include <SFML/Graphics.hpp>
 
 
 Map::Map(){
@@ -26,31 +27,27 @@ void Map::generate(){
     
 }
 
-void Map::display() const {
+void Map::display(sf::RenderWindow& window){
     for(int y=0;y<HEIGHT;y++){
         for(int x=0;x<WIDTH;x++){
-            if(tiles[y][x].hasOccupant()){
-            Character* c=tiles[y][x].getOccupant();
-            std::string playerName=c->getName();
 
-            if (playerName == "Warrior") {
-                    std::cout << 'W';
-                } else if (playerName == "Mage") {
-                    std::cout << 'M';
-                } else if (playerName == "Rogue") {
-                    std::cout << 'R';
-                } else {
-                    std::cout << 'E';
-                }
+    sf::RectangleShape tileShape({32.f, 32.f});
+            tileShape.setPosition({x * 32.f, y * 32.f});
+
+            
+            if (tiles[y][x].getSymbol() == '#') {
+                tileShape.setFillColor(sf::Color(50, 50, 50)); 
+            } else {
+                tileShape.setFillColor(sf::Color(20, 20, 20));
+                tileShape.setOutlineThickness(1.f);
+                tileShape.setOutlineColor(sf::Color(30, 30, 30));
             }
-            else {
-                std::cout << tiles[y][x].getSymbol();
-            }
+            window.draw(tileShape);
             
 
 
             }
-            std::cout<<'\n';
+           
         }
         
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "Tile.h"
+#include <SFML/Graphics.hpp>
 
 class Map{
 private:
@@ -14,7 +15,7 @@ public:
     int getHeight() const {return HEIGHT;}
 
     void generate();
-    void display() const;
+    void display(sf::RenderWindow& window);
     bool isInside(int x, int y) const;
     bool checkIfWalkable(int x, int y) const;
     Tile* getTile(int x, int y);
@@ -24,3 +25,5 @@ public:
     bool moveCharacter(int fromX, int fromY, int toX, int toY);
 
 };
+
+

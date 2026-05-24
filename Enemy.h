@@ -6,6 +6,7 @@
 class Enemy : public Character {
 private:
     int expReward;
+   
 
 public:
     Enemy(std::string n, int h, int mH, int ar, int aD,
@@ -19,6 +20,8 @@ public:
         return expReward;
     }
 
+    sf::Clock attackClockEnemy;
+    
     void randomMove(Map& map) {
     int dx = 0;
     int dy = 0;

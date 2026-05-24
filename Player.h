@@ -41,6 +41,10 @@ public:
         
     }
 
+    void resetAbility(){
+        abilityUsed=false;
+    }
+
     virtual void specialAbility(Character& target)=0;
 
 

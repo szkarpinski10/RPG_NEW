@@ -5,7 +5,7 @@ public:
 
 
 
-    Rogue(): Player ("Rogue",90,90,4,18,1.5f,1.5f,1,1){}
+    Rogue(): Player ("Rogue",90,90,4,15,3.0f,2.0f,1,1){}
 
     void specialAbility(Character& target) override{
         if(!abilityUsed){
