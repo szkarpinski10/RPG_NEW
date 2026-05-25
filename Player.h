@@ -7,8 +7,10 @@ protected:
     int exp;
     int expToNextLevel;
     bool abilityUsed;
-    
+    bool isBuffed=false;    
+
 public:
+
     Player(std::string n, int h, int mH, int ar, int aD, float aR, float aS, int posX, int posY)
     : Character(n,h,mH,ar,aD,aR,aS,posX,posY){
         level=1;

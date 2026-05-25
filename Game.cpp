@@ -9,7 +9,7 @@ Game::Game(Player* p){
     player=p;
     running=true;
     weaponSprite=nullptr;
-    abilityReady=true;
+   
 
     if (!font.openFromFile("PressStart2P-Regular.ttf")) {
         std::cout << "blad czcionki\n";
@@ -37,7 +37,6 @@ Game::Game(Player* p){
         weaponSprite->setOrigin({wymiaryBroni.size.x/2.f,wymiaryBroni.size.y});
     }
 
-    
 }
 
 Game::~Game(){
@@ -51,12 +50,10 @@ Game::~Game(){
     enemies.clear();
 }
 
-void Game::start(sf::RenderWindow& window){
-    // Czyszczenie na wypadek restartu gry
-    for (Enemy* e : enemies) delete e;
-    enemies.clear();
 
-    // Dodanie przeciwników
+void Game::start(sf::RenderWindow& window){
+    
+    // Dodanie przeciwników i gracza
     enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 5, 4, 30));
     enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 4, 8, 30));
     enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 9, 5, 30));
@@ -72,21 +69,27 @@ void Game::start(sf::RenderWindow& window){
     enemies.push_back(new Enemy("Orc", 200, 200, 6, 30, 4.0f, 0.4f, 19, 14, 200));
 
     map.placeCharacter(player->getX(), player->getY(), player);
+
+    //reset ataku przeciwników i postawienie ich na mapie
     for (Enemy* e : enemies) {
         e->attackClockEnemy.restart();
         map.placeCharacter(e->getX(), e->getY(), e);
     }
-    abilityReady = true;
     player->resetAbility();
-    // Pętla główna gry (naprawiona, pojedyncza)
+
+    
     while(running && window.isOpen()){
         while (const std::optional event = window.pollEvent()) {
+            //zamkniecie okna jak sie wcisnie X
             if (event->is<sf::Event::Closed>()) {
+                
                 window.close();
             }
+            //odczytywanie znaków z klawiatury
             else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
                 handleInput(keyPressed->code);
             }
+            //odczytywanie jak sie kliknie myszke LPM i pozycje
             else if(const auto* mousePressed=event->getIf<sf::Event::MouseButtonPressed>()){
                 if (mousePressed->button == sf::Mouse::Button::Left) {
                     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
@@ -103,23 +106,21 @@ void Game::start(sf::RenderWindow& window){
 }
 
 void Game::update(sf::RenderWindow& window) {
-    static sf::Clock frameClock;
-    float dt = frameClock.restart().asSeconds();
+   
 
     if (!player->isAlive()) {
-        std::cout << "You died" << std::endl;
+        std::cout << "you died" << std::endl;
         running = false;
         return;
     }
+
     if (specialAbilityClock.getElapsedTime().asSeconds() >= 30.0f) {
-        if (!abilityReady) {
-            abilityReady = true;
-            player->resetAbility(); // <--- TO ODNOWI PASKI W HUD!
-            std::cout << "Zdolnosc specjalna jest ponownie GOTOWA!" << std::endl;
+        if (player->isAbilityUsed()) { 
+            player->resetAbility(); 
         }
     }
 
-    // Sprawdzenie czy wszyscy żyją
+    //sprawdzenie czy wsyscy zyja
     bool allDead = true;
     for (Enemy* e : enemies) {
         if (e->isAlive()) {
@@ -127,43 +128,42 @@ void Game::update(sf::RenderWindow& window) {
             break;
         }
     }
-    if (allDead && !enemies.empty()) {
-        std::cout << "Koniec gry. Zwyciestwo! Wszyscy wrogowie pokonani!" << std::endl;
+    if (allDead) {
+        std::cout << "koniec gry. zwyciestwo" << std::endl;
         running = false;
         return;
     }
 
     if (running) {
-        // --- LOGIKA DLA KAŻDEGO PRZECIWNIKA Z OSOBNA ---
+
+    // ruch i atak przeciwników     
         for (Enemy* e : enemies) {
             if (!e->isAlive()) continue;
 
-            // Ruch bota
+           
             if (enemyMoveClock.getElapsedTime().asSeconds() >= 0.7f) {
                 e->randomMove(map);
+                e->enemyMoveClock.restart();
             }
 
-            // Atak bota
             int distance = std::abs(e->getX() - player->getX()) + std::abs(e->getY() - player->getY());
             if (distance <= e->getAttackRange()) {
-                if (e->attackClockEnemy.getElapsedTime().asSeconds() >= (1.0f / e->getAttackSpeed())) {
+                if (e->attackClockEnemy.getElapsedTime().asSeconds() >=e->getAttackSpeed()) {
                     int chance = std::rand() % 3; 
                     if (chance < 2) { 
                         player->takeDamage(e->getAttackDamage());
-                        std::cout << e->getName() << " trafil! HP gracza: " << player->getHealth() << std::endl;
-                    } else {
-                        std::cout << e->getName() << " chybil!" << std::endl;
-                    }
+                    } 
                     e->attackClockEnemy.restart();
                 }
             }
         }
 
-        if (enemyMoveClock.getElapsedTime().asSeconds() >= 0.7f) {
-            enemyMoveClock.restart();
-        }
 
-        // --- LOGIKA KULI MAGA ---
+//atak maga 
+
+    static sf::Clock frameClock;
+    float dt = frameClock.restart().asSeconds();
+
         if (isfireballflying) {
             fireball.move(fireballVelocity * dt);
 
@@ -186,14 +186,12 @@ void Game::update(sf::RenderWindow& window) {
                     fireballPos.y >= enemyPy && fireballPos.y <= enemyPy + 32.f) {
                     
                     e->takeDamage(player->getAttackDamage());
-                    std::cout << "Trafiono " << e->getName() << "! HP wroga: " << e->getHealth() << std::endl;
                     isfireballflying = false;
                     break; 
                 }
             }
         }
 
-        // --- ANIMACJA BRONI ---
         if (player->isAlive() && weaponSprite != nullptr) {
             sf::Vector2f playerCenter((player->getX() * 32.f) + 16.f, (player->getY() * 32.f) + 16.f);
             weaponSprite->setPosition(playerCenter);
@@ -206,9 +204,12 @@ void Game::update(sf::RenderWindow& window) {
     }
 }
 
+
+
 void Game::handleInput(sf::Keyboard::Key key){
     if(player->isAlive() && running){
-        // --- OBSŁUGA RUCHU GRACZA (W, S, A, D) ---
+
+    // ruch gracza WASD
         if (playerMoveClock.getElapsedTime().asSeconds() >= 0.15f) {
             int nextX = player->getX();
             int nextY = player->getY();
@@ -218,7 +219,6 @@ void Game::handleInput(sf::Keyboard::Key key){
             if (key == sf::Keyboard::Key::A) nextX--;
             if (key == sf::Keyboard::Key::D) nextX++;
 
-            // Wykonaj ruch tylko jeśli gracz faktycznie kliknął kierunek
             if (nextX != player->getX() || nextY != player->getY()) {
                 if (map.getTile(nextX, nextY)->canEnter()) {
                     map.moveCharacter(player->getX(), player->getY(), nextX, nextY);
@@ -229,48 +229,48 @@ void Game::handleInput(sf::Keyboard::Key key){
             }
         }
 
-       if (key == sf::Keyboard::Key::E) {
-            // Możemy użyć, jeśli nasza flaga w Game jest true (na starcie lub po 30s)
-            if (abilityReady) {
-                
-                // Szukamy najbliższego żywego wroga
-                Enemy* targetEnemy = nullptr;
-                for (Enemy* e : enemies) {
-                    if (e->isAlive()) {
-                        targetEnemy = e;
-                        break; 
-                    }
-                }
+// dziwnie zreczy sie tu dzieja do poprawy 
 
-                bool skillExecuted = false;
+    //    if (key == sf::Keyboard::Key::E) {
+    //         if (!player->isAbilityUsed()) {
+    //             // Szukamy najbliższego żywego wroga
+    //             Enemy* targetEnemy = nullptr;
+    //             for (Enemy* e : enemies) {
+    //                 if (e->isAlive()) {
+    //                     targetEnemy = e;
+    //                     break; 
+    //                 }
+    //             }
 
-                if (player->getName() == "Mage") {
-                    // Mag leczy samego siebie – cel nie jest mu potrzebny
-                    player->specialAbility(*player); 
-                    std::cout << "Mag uzywa zaklecia uzdrawiania!" << std::endl;
-                    skillExecuted = true;
-                } 
-                else if (targetEnemy != nullptr) {
-                    // Wojownik i Łotr potrzebują celu
-                    player->specialAbility(*targetEnemy);
-                    std::cout << "Uzyto super umiejetnosci na: " << targetEnemy->getName() << "!" << std::endl;
-                    skillExecuted = true;
-                } else {
-                    std::cout << "Brak przeciwnika w poblizu, nie mozesz uzyc tej zdolnosci!" << std::endl;
-                }
+    //             bool skillExecuted = false;
 
-                // Jeśli użyliśmy skilla: odpalamy cooldown
-                if (skillExecuted) {
-                    abilityReady = false; 
-                    specialAbilityClock.restart(); // Zegar rusza od 0 do 30s
-                }
-            } 
-            else {
-                float elapsed = specialAbilityClock.getElapsedTime().asSeconds();
-                float pozostalo = 30.0f - elapsed;
-                std::cout << "Zdolnosc sie odnawia! Poczekaj jeszcze: " << std::round(pozostalo) << "s" << std::endl;
-            }
-        }
+    //             if (player->getName() == "Mage") {
+    //                 // Mag leczy samego siebie – cel nie jest mu potrzebny
+    //                 player->specialAbility(*player); 
+    //                 std::cout << "Mag uzywa zaklecia uzdrawiania!" << std::endl;
+    //                 skillExecuted = true;
+    //             } 
+    //             else if (targetEnemy != nullptr) {
+    //                 // Wojownik i Łotr potrzebują celu
+    //                 player->specialAbility(*targetEnemy);
+    //                 std::cout << "Uzyto super umiejetnosci na: " << targetEnemy->getName() << "!" << std::endl;
+    //                 skillExecuted = true;
+    //             } else {
+    //                 std::cout << "Brak przeciwnika w poblizu, nie mozesz uzyc tej zdolnosci!" << std::endl;
+    //             }
+
+    //             // Jeśli użyliśmy skilla: odpalamy cooldown
+    //             if (skillExecuted) {
+    //                 player->isAbilityUsed();
+    //                 specialAbilityClock.restart(); // Zegar rusza od 0 do 30s
+    //             }
+    //         } 
+    //         else {
+    //             float elapsed = specialAbilityClock.getElapsedTime().asSeconds();
+    //             float pozostalo = 30.0f - elapsed;
+    //             std::cout << "Zdolnosc sie odnawia! Poczekaj jeszcze: " << std::round(pozostalo) << "s" << std::endl;
+    //         }
+    //     }
     }
 }
 

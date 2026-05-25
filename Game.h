@@ -10,11 +10,10 @@ class Game {
 private:
     Map map;
     Player* player;
-    //Enemy* enemy;
     bool running;
     HUD* hud;
     std::vector<Enemy*> enemies;
-    bool abilityReady;
+    
 
     sf::CircleShape fireball;
     bool isfireballflying = false;
@@ -51,7 +50,5 @@ public:
 
     void start(sf::RenderWindow& window);
     void update(sf::RenderWindow& window);
-    bool isRunning() const{
-        return running;
-    }
+    bool isRunning() const{return running;}
 };

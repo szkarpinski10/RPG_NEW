@@ -19,7 +19,7 @@ public:
     int getExpReward() const {return expReward;}
 
     sf::Clock attackClockEnemy;
-    
+    sf::Clock enemyMoveClock;
     void randomMove(Map& map) {
         int dx = 0;
         int dy = 0;
