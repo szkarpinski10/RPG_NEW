@@ -9,6 +9,7 @@ Game::Game(Player* p){
     player=p;
     running=true;
     weaponSprite=nullptr;
+    abilityReady=true;
 
     if (!font.openFromFile("PressStart2P-Regular.ttf")) {
         std::cout << "blad czcionki\n";
@@ -35,6 +36,8 @@ Game::Game(Player* p){
         sf::FloatRect wymiaryBroni=weaponSprite->getLocalBounds();
         weaponSprite->setOrigin({wymiaryBroni.size.x/2.f,wymiaryBroni.size.y});
     }
+
+    
 }
 
 Game::~Game(){
@@ -54,26 +57,27 @@ void Game::start(sf::RenderWindow& window){
     enemies.clear();
 
     // Dodanie przeciwników
-    enemies.push_back(new Enemy("Goblin Straznik 1", 40, 40, 1, 8, 4.0f, 1.0f, 5, 4, 30));
-    enemies.push_back(new Enemy("Goblin Straznik 2", 40, 40, 1, 8, 4.0f, 1.0f, 4, 8, 30));
-    enemies.push_back(new Enemy("Goblin Wojownik 1", 40, 40, 1, 8, 4.0f, 1.0f, 9, 5, 30));
-    enemies.push_back(new Enemy("Goblin Wojownik 2", 40, 40, 1, 8, 4.0f, 1.0f, 10, 6, 30));
-    enemies.push_back(new Enemy("Goblin Łucznik 1",   40, 40, 1, 8, 4.0f, 1.0f, 9,  7, 30));
-    enemies.push_back(new Enemy("Goblin Zwiadowca 1", 40, 40, 1, 8, 4.0f, 1.0f, 3,  12, 30));
-    enemies.push_back(new Enemy("Goblin Zwiadowca 2", 40, 40, 1, 8, 4.0f, 1.0f, 6,  14, 30));
-    enemies.push_back(new Enemy("Goblin Veteran 1", 45, 45, 2, 10, 4.0f, 1.1f, 13, 8,  35));
-    enemies.push_back(new Enemy("Goblin Veteran 2", 45, 45, 2, 10, 4.0f, 1.1f, 14, 11, 35));
-    enemies.push_back(new Enemy("Goblin Szaman",    40, 40, 1, 12, 4.0f, 0.9f, 16, 6,  40));
-    enemies.push_back(new Enemy("Orc Straznik", 150, 150, 5, 25, 4.0f, 0.5f, 12, 10, 150));
-    enemies.push_back(new Enemy("Orc Berserker 1", 160, 160, 4, 28, 4.0f, 0.6f, 18, 13, 160));
-    enemies.push_back(new Enemy("Orc Wodz",        200, 200, 6, 30, 4.0f, 0.4f, 19, 14, 200));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 5, 4, 30));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 4, 8, 30));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 9, 5, 30));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 10, 6, 30));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 9,  7, 30));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 3,  12, 30));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 6,  14, 30));
+    enemies.push_back(new Enemy("Goblin", 45, 45, 2, 10, 4.0f, 1.1f, 13, 8,  35));
+    enemies.push_back(new Enemy("Goblin", 45, 45, 2, 10, 4.0f, 1.1f, 14, 11, 35));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 12, 4.0f, 0.9f, 16, 6,  40));
+    enemies.push_back(new Enemy("Orc", 150, 150, 5, 25, 4.0f, 0.5f, 12, 10, 150));
+    enemies.push_back(new Enemy("Orc", 160, 160, 4, 28, 4.0f, 0.6f, 18, 13, 160));
+    enemies.push_back(new Enemy("Orc", 200, 200, 6, 30, 4.0f, 0.4f, 19, 14, 200));
 
     map.placeCharacter(player->getX(), player->getY(), player);
     for (Enemy* e : enemies) {
         e->attackClockEnemy.restart();
         map.placeCharacter(e->getX(), e->getY(), e);
     }
-
+    abilityReady = true;
+    player->resetAbility();
     // Pętla główna gry (naprawiona, pojedyncza)
     while(running && window.isOpen()){
         while (const std::optional event = window.pollEvent()) {
@@ -106,6 +110,13 @@ void Game::update(sf::RenderWindow& window) {
         std::cout << "You died" << std::endl;
         running = false;
         return;
+    }
+    if (specialAbilityClock.getElapsedTime().asSeconds() >= 30.0f) {
+        if (!abilityReady) {
+            abilityReady = true;
+            player->resetAbility(); // <--- TO ODNOWI PASKI W HUD!
+            std::cout << "Zdolnosc specjalna jest ponownie GOTOWA!" << std::endl;
+        }
     }
 
     // Sprawdzenie czy wszyscy żyją
@@ -197,6 +208,7 @@ void Game::update(sf::RenderWindow& window) {
 
 void Game::handleInput(sf::Keyboard::Key key){
     if(player->isAlive() && running){
+        // --- OBSŁUGA RUCHU GRACZA (W, S, A, D) ---
         if (playerMoveClock.getElapsedTime().asSeconds() >= 0.15f) {
             int nextX = player->getX();
             int nextY = player->getY();
@@ -206,45 +218,60 @@ void Game::handleInput(sf::Keyboard::Key key){
             if (key == sf::Keyboard::Key::A) nextX--;
             if (key == sf::Keyboard::Key::D) nextX++;
 
-            if (map.getTile(nextX, nextY)->canEnter()) {
-                map.moveCharacter(player->getX(), player->getY(), nextX, nextY);
-                player->setX(nextX);
-                player->setY(nextY);
-            }
-            
-            playerMoveClock.restart();
-        }
-    }
-    if (key == sf::Keyboard::Key::E) {
-    if (specialAbilityClock.getElapsedTime().asSeconds() >= 5.0f) {
-        
-        // Szukamy pierwszego żywego wroga, żeby przekazać go jako cel (target)
-        Enemy* targetEnemy = nullptr;
-        for (Enemy* e : enemies) {
-            if (e->isAlive()) {
-                targetEnemy = e;
-                break; // Bierzemy pierwszego lepszego żywego bota jako cel ataku
+            // Wykonaj ruch tylko jeśli gracz faktycznie kliknął kierunek
+            if (nextX != player->getX() || nextY != player->getY()) {
+                if (map.getTile(nextX, nextY)->canEnter()) {
+                    map.moveCharacter(player->getX(), player->getY(), nextX, nextY);
+                    player->setX(nextX);
+                    player->setY(nextY);
+                }
+                playerMoveClock.restart();
             }
         }
 
-        // Jeśli znaleźliśmy wroga (lub dla Maga - nawet jeśli go nie ma, bo Mag leczy siebie)
-        // POLIMORFIZM W AKCJI: Wywołujemy jedną metodę, a C++ wie co zrobić!
-        if (targetEnemy != nullptr) {
-            player->specialAbility(*targetEnemy);
-            std::cout << "Uzyto umiejetnosci specjalnej klasy " << player->getName() << "!" << std::endl;
-            specialAbilityClock.restart();
-        } else if (player->getName() == "Mage") {
-            // Mag może uleczyć się nawet, gdy wszyscy wrogowie nie żyją
-            player->specialAbility(*player); // Przekazujemy cokolwiek, bo Mag i tak ignoruje target
-            std::cout << "Mag uleczyl sie poza walka!" << std::endl;
-            specialAbilityClock.restart();
+       if (key == sf::Keyboard::Key::E) {
+            // Możemy użyć, jeśli nasza flaga w Game jest true (na starcie lub po 30s)
+            if (abilityReady) {
+                
+                // Szukamy najbliższego żywego wroga
+                Enemy* targetEnemy = nullptr;
+                for (Enemy* e : enemies) {
+                    if (e->isAlive()) {
+                        targetEnemy = e;
+                        break; 
+                    }
+                }
+
+                bool skillExecuted = false;
+
+                if (player->getName() == "Mage") {
+                    // Mag leczy samego siebie – cel nie jest mu potrzebny
+                    player->specialAbility(*player); 
+                    std::cout << "Mag uzywa zaklecia uzdrawiania!" << std::endl;
+                    skillExecuted = true;
+                } 
+                else if (targetEnemy != nullptr) {
+                    // Wojownik i Łotr potrzebują celu
+                    player->specialAbility(*targetEnemy);
+                    std::cout << "Uzyto super umiejetnosci na: " << targetEnemy->getName() << "!" << std::endl;
+                    skillExecuted = true;
+                } else {
+                    std::cout << "Brak przeciwnika w poblizu, nie mozesz uzyc tej zdolnosci!" << std::endl;
+                }
+
+                // Jeśli użyliśmy skilla: odpalamy cooldown
+                if (skillExecuted) {
+                    abilityReady = false; 
+                    specialAbilityClock.restart(); // Zegar rusza od 0 do 30s
+                }
+            } 
+            else {
+                float elapsed = specialAbilityClock.getElapsedTime().asSeconds();
+                float pozostalo = 30.0f - elapsed;
+                std::cout << "Zdolnosc sie odnawia! Poczekaj jeszcze: " << std::round(pozostalo) << "s" << std::endl;
+            }
         }
-    } 
-    else {
-        float pozostalo = 5.0f - specialAbilityClock.getElapsedTime().asSeconds();
-        std::cout << "Zdolnosc sie odnawia! Poczekaj: " << pozostalo << "s" << std::endl;
     }
-}
 }
 
 void Game::render(sf::RenderWindow& window){

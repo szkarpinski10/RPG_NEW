@@ -16,33 +16,31 @@ public:
         expReward = expR;
     }
 
-    int getExpReward() const {
-        return expReward;
-    }
+    int getExpReward() const {return expReward;}
 
     sf::Clock attackClockEnemy;
     
     void randomMove(Map& map) {
-    int dx = 0;
-    int dy = 0;
+        int dx = 0;
+        int dy = 0;
 
-    int direction = rand() % 5;
+        int direction = rand() % 5;
 
-    if (direction == 0) {
+        if (direction == 0) {
         dy = -1;
-    }
+        }
 
-    else if (direction == 1) {
+        else if (direction == 1) {
         dy = 1;
-    }
+        }
 
-    else if (direction == 2) {
+        else if (direction == 2) {
         dx = -1;
-    }
+        }
 
-    else if (direction == 3) {
+        else if (direction == 3) {
         dx = 1;
-    }
+        }
 
     int newX = x + dx;
     int newY = y + dy;
@@ -50,6 +48,5 @@ public:
     map.moveCharacter(x, y, newX, newY);
 }
  
-
 };
 

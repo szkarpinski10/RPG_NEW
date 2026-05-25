@@ -7,6 +7,7 @@ protected:
     int exp;
     int expToNextLevel;
     bool abilityUsed;
+    
 public:
     Player(std::string n, int h, int mH, int ar, int aD, float aR, float aS, int posX, int posY)
     : Character(n,h,mH,ar,aD,aR,aS,posX,posY){
@@ -38,6 +39,7 @@ public:
         maxHealth+=20;
         health=maxHealth;
         attackDamage+=5;
+
         
     }
 

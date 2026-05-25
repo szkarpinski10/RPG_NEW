@@ -8,6 +8,7 @@ Map::Map(){
     generate();
 }
 
+// Funkcja tworzaca mape: prostokąt z obramówka, po ktorej nie można chodzic
 void Map::generate(){
     for(int y=0;y<HEIGHT;y++){
         for(int x=0;x<WIDTH;x++){
@@ -27,6 +28,7 @@ void Map::generate(){
     
 }
 
+//Funkcja rysujaca mape na podstawie wczesniej stworzonej z funkcji void Map::generate();
 void Map::display(sf::RenderWindow& window){
     for(int y=0;y<HEIGHT;y++){
         for(int x=0;x<WIDTH;x++){
@@ -57,12 +59,12 @@ bool Map::isInside(int x,int y) const {
 }
 
 
-bool Map::checkIfWalkable(int x,int y) const{
-    if(!isInside(x,y)){
-        return false;
-    }
-    return tiles[y][x].canEnter();
-}
+// bool Map::checkIfWalkable(int x,int y) const{
+//     if(!isInside(x,y)){
+//         return false;
+//     }
+//     return tiles[y][x].canEnter();
+// }
 
 
 Tile* Map::getTile(int x, int y) {
@@ -73,6 +75,7 @@ Tile* Map::getTile(int x, int y) {
     return &tiles[y][x];
 }
 
+//Funkcja place character
 bool Map::placeCharacter(int x, int y, Character* character) {
     if (!isInside(x, y)) {
         return false;
@@ -87,6 +90,7 @@ bool Map::placeCharacter(int x, int y, Character* character) {
     return true;
 }
 
+//Funkcja usuwajaca postac
 bool Map::removeCharacter(int x, int y) {
     if (!isInside(x, y)) {
         return false;
@@ -100,6 +104,7 @@ bool Map::removeCharacter(int x, int y) {
     return true;
 }
 
+//Funkcja przesuwajaca postac
 bool Map::moveCharacter(int fromX, int fromY, int toX, int toY) {
     if (!isInside(fromX, fromY) || !isInside(toX, toY)) {
         return false;

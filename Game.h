@@ -14,6 +14,7 @@ private:
     bool running;
     HUD* hud;
     std::vector<Enemy*> enemies;
+    bool abilityReady;
 
     sf::CircleShape fireball;
     bool isfireballflying = false;

@@ -17,7 +17,6 @@ public:
     void generate();
     void display(sf::RenderWindow& window);
     bool isInside(int x, int y) const;
-    bool checkIfWalkable(int x, int y) const;
     Tile* getTile(int x, int y);
 
     bool placeCharacter(int x, int y, Character* character);
