@@ -1,6 +1,9 @@
 #pragma once
 #include "Character.h"
 
+class Enemy;
+class Map;
+
 class Player: public Character{
 protected:
     int level;
@@ -27,16 +30,16 @@ public:
     void setX(int newX) { x = newX; }
     void setY(int newY) { y = newY; }
 
-    void gainExp(int amount){
-        exp+=amount;
-        if(exp>=expToNextLevel){
-            levelUp();
-        }
+    void gainExp(int amount) {
+    exp += amount;
+    while (exp >= expToNextLevel) {  
+        exp -= expToNextLevel;      
+        levelUp();
     }
+}
 
     void levelUp(){
         level++;
-        exp=0;
         expToNextLevel+=200;
         maxHealth+=20;
         health=maxHealth;
@@ -49,7 +52,7 @@ public:
         abilityUsed=false;
     }
 
-    virtual void specialAbility(Character& target)=0;
-
+    virtual void specialAbility(std::vector<Enemy*>& enemies, Map& map)=0;
+   
 
 };

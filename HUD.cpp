@@ -7,6 +7,7 @@ HUD::HUD(sf::Font& font){
     hudText =new sf::Text(font);
     hudText ->setCharacterSize(12);
     hudText->setFillColor(sf::Color::Black);
+    fontRef = &font;
 
 }
 
@@ -15,7 +16,6 @@ HUD::~HUD(){
 }
 
 void HUD::draw(sf::RenderWindow& window, const Player* player, sf::Clock& specialAbilityClock){
-    //Pasek wyświetlający hp
 
     sf::RectangleShape hpBar({hudWidth,hudHeight});
     hpBar.setFillColor(sf::Color(200,30,30));
@@ -60,6 +60,50 @@ void HUD::draw(sf::RenderWindow& window, const Player* player, sf::Clock& specia
         window.draw(*hudText);
 
 
+
    }
 
+    drawStatsPanel(window, player);
+}
+
+void HUD::drawStatsPanel(sf::RenderWindow& window, const Player* player) {
+    
+    sf::RectangleShape panel({statsWidth, statsHeight});
+    panel.setFillColor(sf::Color::Black);
+    panel.setPosition({statsX, statsY});
+    window.draw(panel);
+
+    // Tekst
+    sf::Text statsText(*fontRef);
+    statsText.setCharacterSize(10);
+    statsText.setFillColor(sf::Color::White);
+
+    float lineHeight = 16.f;
+    float startY = statsY + 10.f;
+
+    statsText.setString("Class: " + player->getName());
+    statsText.setPosition({statsX + 10.f, startY});
+    window.draw(statsText);
+
+    statsText.setString("LVL: " + std::to_string(player->getLevel()));
+    statsText.setPosition({statsX + 10.f, startY + lineHeight});
+    window.draw(statsText);
+
+    statsText.setString("AttackDmg: " + std::to_string(player->getAttackDamage()));
+    statsText.setPosition({statsX + 10.f, startY + lineHeight * 2});
+    window.draw(statsText);
+
+    statsText.setString("Armor: " + std::to_string(player->getArmor()));
+    statsText.setPosition({statsX + 10.f, startY + lineHeight * 3});
+    window.draw(statsText);
+
+    statsText.setString("Range: " + std::to_string((int)player->getAttackRange()));
+    statsText.setPosition({statsX + 10.f, startY + lineHeight * 4});
+    window.draw(statsText);
+
+    char speedStr[10];
+    snprintf(speedStr, sizeof(speedStr), "%.1fs", player->getAttackSpeed());
+    statsText.setString("AttackSpeed: " + std::string(speedStr));
+    statsText.setPosition({statsX + 10.f, startY + lineHeight * 5});
+    window.draw(statsText);
 }

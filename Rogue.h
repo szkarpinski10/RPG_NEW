@@ -1,19 +1,20 @@
 #pragma once
 #include "Player.h"
-class Rogue : public Player{
+#include "Enemy.h"
+
+
+
+class Rogue : public Player {
 public:
-
-
     // nazwa, zycie, max zycie, armor, attackdamage, attackrange, attackspeed, posx i pos y
-    Rogue(): Player ("Rogue",90,90,4,15,3.0f,2.0f,1,1){}
+    Rogue(): Player("Rogue", 100, 90, 4, 15, 4.0f, 0.5f, 1, 1) {}
 
-    void specialAbility(Character& target) override{
-        if(!abilityUsed){
-           target.takeDamage(attackDamage+20);
-            heal(20);
-            abilityUsed=true;
-        }
+    void specialAbility(std::vector<Enemy*>& enemies, Map& map) override {
+        
+        attackDamage += 7;   
+        attackSpeed += 0.5f;  
+        
+        abilityUsed = true;   
+       
     }
-     
-
 };

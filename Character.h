@@ -41,7 +41,7 @@ public:
     int getX() const { return x; }
     int getY() const { return y; }
 
-     void setPosition(int newX, int newY){
+    void setPosition(int newX, int newY){
         x=newX;
         y=newY;
     }

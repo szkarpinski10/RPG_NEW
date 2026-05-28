@@ -4,6 +4,7 @@
 #include "Enemy.h"
 #include <SFML/Graphics.hpp>
 #include "HUD.h"
+#include "GUI.h"
 #include <vector>
 
 class Game {
@@ -12,6 +13,7 @@ private:
     Player* player;
     bool running;
     HUD* hud;
+    GUI* gui;
     std::vector<Enemy*> enemies;
     
 
@@ -42,7 +44,7 @@ private:
 
     void handleInput(sf::Keyboard::Key key);
     void handleMouseClick(sf::Vector2i mousePos,sf::RenderWindow& window); 
-    void render(sf::RenderWindow& window);
+   
 
 public:
     Game(Player* p);

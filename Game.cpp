@@ -4,44 +4,50 @@
 #include "Player.h"
 #include "HUD.h"
 #include "Enemy.h"
+#include "GUI.h"
 
-Game::Game(Player* p){
-    player=p;
-    running=true;
-    weaponSprite=nullptr;
-   
+Game::Game(Player* p) {
+    player = p;
+    running = true;
+    weaponSprite = nullptr;
 
     if (!font.openFromFile("PressStart2P-Regular.ttf")) {
         std::cout << "blad czcionki\n";
     }
+    
     hud = new HUD(font);
+    gui = new GUI(font);
 
-    if(!warriorWeaponImg.loadFromFile("LongSword-1.png")||
+    if (!warriorWeaponImg.loadFromFile("LongSword-1.png") ||
         !rogueWeaponImg.loadFromFile("SmallSword.png") ||
         !mageWeaponImg.loadFromFile("Staff4.png")) {
         std::cout << "blad grafik broni\n";
     }
 
-    if(player->getName()=="Warrior"){
-        weaponSprite=new sf::Sprite(warriorWeaponImg);
+    if (player->getName() == "Warrior") {
+        weaponSprite = new sf::Sprite(warriorWeaponImg);
     }
-    else if(player->getName()=="Mage"){
-        weaponSprite=new sf::Sprite(mageWeaponImg);
+    else if (player->getName() == "Mage") {
+        weaponSprite = new sf::Sprite(mageWeaponImg);
     }
-    else if(player->getName()=="Rogue"){
-        weaponSprite=new sf::Sprite(rogueWeaponImg);
-    }
-
-    if(weaponSprite!=nullptr){
-        sf::FloatRect wymiaryBroni=weaponSprite->getLocalBounds();
-        weaponSprite->setOrigin({wymiaryBroni.size.x/2.f,wymiaryBroni.size.y});
+    else if (player->getName() == "Rogue") {
+        weaponSprite = new sf::Sprite(rogueWeaponImg);
     }
 
+    if (weaponSprite != nullptr) {
+        sf::FloatRect wymiaryBroni = weaponSprite->getLocalBounds();
+        weaponSprite->setOrigin({wymiaryBroni.size.x / 2.f, wymiaryBroni.size.y});
+    }
+
+    // ← PRZENIESIONE TUTAJ, bo weaponSprite jest tworzony WYŻEJ
+    gui->setWeaponSprite(weaponSprite);
+    gui->setFireball(&fireball, &isfireballflying);  // ← uważaj na nazwę!
 }
 
-Game::~Game(){
-    delete player;
+Game::~Game() {
+    
     delete hud;
+    delete gui;  // ← DODANE
     delete weaponSprite;
 
     for (Enemy* e : enemies) {
@@ -50,57 +56,54 @@ Game::~Game(){
     enemies.clear();
 }
 
-
-void Game::start(sf::RenderWindow& window){
+void Game::start(sf::RenderWindow& window) {
     
-    // Dodanie przeciwników i gracza
-    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 5, 4, 30));
-    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 4, 8, 30));
-    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 9, 5, 30));
-    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 10, 6, 30));
-    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 9,  7, 30));
-    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 3,  12, 30));
-    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 8, 4.0f, 1.0f, 6,  14, 30));
-    enemies.push_back(new Enemy("Goblin", 45, 45, 2, 10, 4.0f, 1.1f, 13, 8,  35));
-    enemies.push_back(new Enemy("Goblin", 45, 45, 2, 10, 4.0f, 1.1f, 14, 11, 35));
-    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 12, 4.0f, 0.9f, 16, 6,  40));
-    enemies.push_back(new Enemy("Orc", 150, 150, 5, 25, 4.0f, 0.5f, 12, 10, 150));
-    enemies.push_back(new Enemy("Orc", 160, 160, 4, 28, 4.0f, 0.6f, 18, 13, 160));
-    enemies.push_back(new Enemy("Orc", 200, 200, 6, 30, 4.0f, 0.4f, 19, 14, 200));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 12, 4.0f, 1.0f, 5, 4, 30));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 12, 4.0f, 1.0f, 3, 12, 30));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 12, 4.0f, 1.0f, 6, 20, 30));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 12, 4.0f, 1.0f, 8, 8, 30));
+    enemies.push_back(new Enemy("Goblin", 45, 45, 2, 12, 4.0f, 1.1f, 20, 6, 35));
+    enemies.push_back(new Enemy("Goblin", 45, 45, 2, 12, 4.0f, 1.1f, 22, 14, 35));
+    enemies.push_back(new Enemy("Goblin", 45, 45, 2, 12, 4.0f, 1.1f, 18, 20, 35));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 12, 4.0f, 0.9f, 35, 5, 40));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 12, 4.0f, 0.9f, 40, 12, 40));
+    enemies.push_back(new Enemy("Goblin", 40, 40, 1, 12, 4.0f, 0.9f, 44, 24, 40));
+    enemies.push_back(new Enemy("Orc", 150, 150, 5, 25, 4.0f, 0.5f, 15, 15, 150));
+    enemies.push_back(new Enemy("Orc", 160, 160, 4, 28, 4.0f, 0.6f, 30, 7, 160));
+    enemies.push_back(new Enemy("Orc", 160, 160, 4, 28, 4.0f, 0.6f, 30, 22, 160));
+    enemies.push_back(new Enemy("Orc", 200, 200, 6, 30, 4.0f, 0.4f, 42, 15, 200));
+    
 
     map.placeCharacter(player->getX(), player->getY(), player);
 
-    //reset ataku przeciwników i postawienie ich na mapie
     for (Enemy* e : enemies) {
         e->attackClockEnemy.restart();
         map.placeCharacter(e->getX(), e->getY(), e);
     }
     player->resetAbility();
 
-    
-    while(running && window.isOpen()){
+    while (running && window.isOpen()) {
         while (const std::optional event = window.pollEvent()) {
-            //zamkniecie okna jak sie wcisnie X
             if (event->is<sf::Event::Closed>()) {
-                
                 window.close();
             }
-            //odczytywanie znaków z klawiatury
             else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
                 handleInput(keyPressed->code);
             }
-            //odczytywanie jak sie kliknie myszke LPM i pozycje
-            else if(const auto* mousePressed=event->getIf<sf::Event::MouseButtonPressed>()){
+            else if (const auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>()) {
                 if (mousePressed->button == sf::Mouse::Button::Left) {
                     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                    handleMouseClick(mousePos,window);
-                 }
+                    handleMouseClick(mousePos, window);
+                }
             }
         }
-       
+
         update(window);
         window.clear(sf::Color::Black);
-        render(window);
+
+        gui->drawAll(window, map, player, enemies);
+        hud->draw(window, player, specialAbilityClock);
+
         window.display();
     }
 }
@@ -141,9 +144,9 @@ void Game::update(sf::RenderWindow& window) {
             if (!e->isAlive()) continue;
 
            
-            if (enemyMoveClock.getElapsedTime().asSeconds() >= 0.7f) {
-                e->randomMove(map);
-                e->enemyMoveClock.restart();
+            if (e->enemyMoveClock.getElapsedTime().asSeconds() >= 0.7f) {
+            e->randomMove(map);
+            e->enemyMoveClock.restart();
             }
 
             int distance = std::abs(e->getX() - player->getX()) + std::abs(e->getY() - player->getY());
@@ -181,14 +184,19 @@ void Game::update(sf::RenderWindow& window) {
 
                 float enemyPx = e->getX() * 32.f;
                 float enemyPy = e->getY() * 32.f;
+if (fireballPos.x >= enemyPx && fireballPos.x <= enemyPx + 32.f && fireballPos.y >= enemyPy && fireballPos.y <= enemyPy + 32.f) {
+    
+    e->takeDamage(player->getAttackDamage());
+    isfireballflying = false;
 
-                if (fireballPos.x >= enemyPx && fireballPos.x <= enemyPx + 32.f &&
-                    fireballPos.y >= enemyPy && fireballPos.y <= enemyPy + 32.f) {
-                    
-                    e->takeDamage(player->getAttackDamage());
-                    isfireballflying = false;
-                    break; 
-                }
+    if (!e->isAlive()) {
+        player->gainExp(e->getExpReward());
+
+        map.removeCharacter(e->getX(), e->getY());
+    }
+
+    break;
+}
             }
         }
 
@@ -204,7 +212,7 @@ void Game::update(sf::RenderWindow& window) {
     }
 }
 
-
+//obsluga klawiatury
 
 void Game::handleInput(sf::Keyboard::Key key){
     if(player->isAlive() && running){
@@ -231,159 +239,47 @@ void Game::handleInput(sf::Keyboard::Key key){
 
 // dziwnie zreczy sie tu dzieja do poprawy 
 
-    //    if (key == sf::Keyboard::Key::E) {
-    //         if (!player->isAbilityUsed()) {
-    //             // Szukamy najbliższego żywego wroga
-    //             Enemy* targetEnemy = nullptr;
-    //             for (Enemy* e : enemies) {
-    //                 if (e->isAlive()) {
-    //                     targetEnemy = e;
-    //                     break; 
-    //                 }
-    //             }
-
-    //             bool skillExecuted = false;
-
-    //             if (player->getName() == "Mage") {
-    //                 // Mag leczy samego siebie – cel nie jest mu potrzebny
-    //                 player->specialAbility(*player); 
-    //                 std::cout << "Mag uzywa zaklecia uzdrawiania!" << std::endl;
-    //                 skillExecuted = true;
-    //             } 
-    //             else if (targetEnemy != nullptr) {
-    //                 // Wojownik i Łotr potrzebują celu
-    //                 player->specialAbility(*targetEnemy);
-    //                 std::cout << "Uzyto super umiejetnosci na: " << targetEnemy->getName() << "!" << std::endl;
-    //                 skillExecuted = true;
-    //             } else {
-    //                 std::cout << "Brak przeciwnika w poblizu, nie mozesz uzyc tej zdolnosci!" << std::endl;
-    //             }
-
-    //             // Jeśli użyliśmy skilla: odpalamy cooldown
-    //             if (skillExecuted) {
-    //                 player->isAbilityUsed();
-    //                 specialAbilityClock.restart(); // Zegar rusza od 0 do 30s
-    //             }
-    //         } 
-    //         else {
-    //             float elapsed = specialAbilityClock.getElapsedTime().asSeconds();
-    //             float pozostalo = 30.0f - elapsed;
-    //             std::cout << "Zdolnosc sie odnawia! Poczekaj jeszcze: " << std::round(pozostalo) << "s" << std::endl;
-    //         }
-    //     }
-    }
-}
-
-void Game::render(sf::RenderWindow& window){
-    map.display(window);
+    if (key == sf::Keyboard::Key::E) {
+    if (!player->isAbilityUsed()) {
     
-    if (player->isAlive()) {
-        sf::RectangleShape playerShape({32.f, 32.f});
-        playerShape.setPosition({player->getX() * 32.f, player->getY() * 32.f});
-
-        if (player->getName() == "Warrior") {
-            playerShape.setFillColor(sf::Color::Yellow);      
-        } 
-        else if (player->getName() == "Mage") {
-            playerShape.setFillColor(sf::Color::Magenta);  
-        }
-        else if (player->getName() == "Rogue") {
-            playerShape.setFillColor(sf::Color::Blue); 
-        }
+        player->specialAbility(enemies,map); 
+        specialAbilityClock.restart(); 
         
-        window.draw(playerShape);
-        if (weaponSprite != nullptr) {
-            window.draw(*weaponSprite);
-        }   
-
-        if (isfireballflying) {
-            window.draw(fireball);
-        }
-    }
-
-    // Rysowanie wszystkich żywych wrogów z wektora
-  // Rysowanie wszystkich żywych wrogów z wektora razem z literkami
-    for (Enemy* e : enemies) {
-        if (e->isAlive()) {
-            // Obiekt tekstu dla literki potwora
-            sf::Text enemyText(font);
-            enemyText.setCharacterSize(18); // Wielkość literki (dobrana do kafelka 32x32)
-
-            if (e->getName().rfind("Orc", 0) == 0) { 
-                // --- STYL DLA ORKA ---
-                sf::RectangleShape orcShape({40.f, 40.f});
-                orcShape.setFillColor(sf::Color::Red);
-                orcShape.setOutlineThickness(3.f);
-                orcShape.setOutlineColor(sf::Color::Black);
-                
-                sf::Vector2f orcPos((e->getX() * 32.f) - 4.f, (e->getY() * 32.f) - 4.f);
-                orcShape.setPosition(orcPos);
-                window.draw(orcShape);
-
-                // Literka 'O' dla Orka
-                enemyText.setString("O");
-                enemyText.setFillColor(sf::Color::White); // Biała literka, żeby odcinała się od czerwieni
-                
-                // Wyśrodkowanie literki na Orku
-                enemyText.setPosition({orcPos.x + 12.f, orcPos.y + 10.f});
-                window.draw(enemyText);
-            } 
-            else {
-                // --- STYL DLA GOBLINA ---
-                sf::RectangleShape goblinShape({32.f, 32.f});
-                goblinShape.setFillColor(sf::Color(0, 200, 0));
-                goblinShape.setOutlineThickness(2.f);
-                goblinShape.setOutlineColor(sf::Color(138, 43, 226));
-                
-                sf::Vector2f gobPos(e->getX() * 32.f, e->getY() * 32.f);
-                goblinShape.setPosition(gobPos);
-                window.draw(goblinShape);
-
-                // Literka 'G' dla Goblina
-                enemyText.setString("G");
-                enemyText.setFillColor(sf::Color::Black); // Czarna literka, będzie idealnie widoczna na zielonym tle
-                
-                // Wyśrodkowanie literki na Goblinu
-                enemyText.setPosition({gobPos.x + 8.f, gobPos.y + 6.f});
-                window.draw(enemyText);
             }
         }
     }
-
-    hud->draw(window, player, specialAbilityClock);
 }
 
 void Game::handleMouseClick(sf::Vector2i mousePos, sf::RenderWindow& window) {
-    if (!player->isAlive() || !running) return;
+    if (!player->isAlive() || !running) {
+        return;
+    }
 
     sf::Vector2f playerCenter((player->getX() * 32.f) + 16.f, (player->getY() * 32.f) + 16.f);
 
-    // --- LOGIKA MAGA ---
+    // === LOGIKA MAGA ===
     if (player->getName() == "Mage") {
-        if (attackSpeedClock.getElapsedTime().asSeconds() >= (1.0f / player->getAttackSpeed())) {
+        if (attackSpeedClock.getElapsedTime().asSeconds() >= player->getAttackSpeed()) {
             sf::Vector2f targetPos = window.mapPixelToCoords(mousePos);
             sf::Vector2f dir = targetPos - playerCenter;
             float distInPixels = std::sqrt(dir.x * dir.x + dir.y * dir.y);
 
             isfireballflying = true;
-            fireball.setPosition(playerCenter);
-            fireball.setRadius(8.f);
-            fireball.setFillColor(sf::Color(255, 140, 0)); 
-            fireball.setOutlineThickness(2.f);
-            fireball.setOutlineColor(sf::Color::Red);
+            gui->setupFireball(fireball, playerCenter);
 
             if (distInPixels > 0.f) {
-                fireballVelocity = (dir / distInPixels) * 400.f; 
+                fireballVelocity = (dir / distInPixels) * 400.f;
             } else {
                 fireballVelocity = sf::Vector2f(400.f, 0.f);
             }
-            
+
             attackSpeedClock.restart();
         }
-    } 
-    // --- LOGIKA WOJOWNIKA / ŁOTRA ---
+    }
+
+    // === LOGIKA WOJOWNIKA / ŁOTRA ===
     else {
-        if (attackSpeedClock.getElapsedTime().asSeconds() >= (1.0f / player->getAttackSpeed())) {
+        if (attackSpeedClock.getElapsedTime().asSeconds() >= player->getAttackSpeed()) {
             sf::Vector2f targetPos = window.mapPixelToCoords(mousePos);
             sf::Vector2f dir = targetPos - playerCenter;
 
@@ -395,23 +291,26 @@ void Game::handleMouseClick(sf::Vector2i mousePos, sf::RenderWindow& window) {
             isAttacking = true;
             attackAnimationClock.restart();
 
-            bool trafionoKogos = false;
             for (Enemy* e : enemies) {
                 if (!e->isAlive()) continue;
 
-                int tileDistance = std::abs(player->getX() - e->getX()) + std::abs(player->getY() - e->getY());
+                int tileDistance = std::abs(player->getX() - e->getX())
+                                 + std::abs(player->getY() - e->getY());
+
                 if (tileDistance <= player->getAttackRange()) {
                     e->takeDamage(player->getAttackDamage());
-                    std::cout << "Trafiono " << e->getName() << "! HP wroga: " << e->getHealth() << std::endl;
-                    trafionoKogos = true;
+                   
+
+                    // Jesli wrog zginal - daj expa i usun z mapy
+                    if (!e->isAlive()) {
+                        player->gainExp(e->getExpReward());
+                        
+                        map.removeCharacter(e->getX(), e->getY());
+                    }
                 }
             }
 
-            if (!trafionoKogos) {
-                std::cout << "Machnales mieczem w powietrze (Pudlo)!" << std::endl;
-            }
-
-            attackSpeedClock.restart(); 
+            attackSpeedClock.restart();
         }
     }
 }
