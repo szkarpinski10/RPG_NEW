@@ -60,7 +60,7 @@ void GUI::drawEnemies(sf::RenderWindow& window, const std::vector<Enemy*>& enemi
         bool isOrc = (e->getName().rfind("Orc", 0) == 0);
 
         if (isOrc) {
-            // --- ORK ---
+           
             enemyShape.setSize({40.f, 40.f});
             enemyShape.setPosition({enemyPos.x - 4.f, enemyPos.y - 4.f});
             enemyShape.setFillColor(sf::Color::Red);
@@ -72,7 +72,7 @@ void GUI::drawEnemies(sf::RenderWindow& window, const std::vector<Enemy*>& enemi
             enemyText.setPosition({enemyPos.x + 12.f, enemyPos.y + 10.f});
         }
         else {
-            // --- GOBLIN ---
+           
             enemyShape.setFillColor(sf::Color(0, 200, 0));
             enemyShape.setOutlineThickness(2.f);
             enemyShape.setOutlineColor(sf::Color(138, 43, 226));

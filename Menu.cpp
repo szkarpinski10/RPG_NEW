@@ -21,19 +21,17 @@ int Menu::showMenu(sf::RenderWindow& window) {
     quitText.setPosition({600.f, 480.f});
 
     while (window.isOpen()) {
-        
-        // 1. ZDARZENIA (Zamykanie okna + KLIKNIĘCIA)
+                
         while (const std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 window.close();
                 return 2;
             }
 
-            // NIEZAWODNE KLIKNIĘCIE MYSZKĄ
             if (const auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>()) {
                 if (mousePressed->button == sf::Mouse::Button::Left) {
                     
-                    // Pobierz pozycję myszy dokładnie w momencie kliknięcia
+    
                     sf::Vector2f clickPos = window.mapPixelToCoords(mousePressed->position);
 
                     if (startText.getGlobalBounds().contains(clickPos)) {
@@ -62,7 +60,6 @@ int Menu::showMenu(sf::RenderWindow& window) {
             quitText.setFillColor(sf::Color::White);
         }
 
-        // 3. RYSOWANIE
         window.clear(sf::Color::Black);
         window.draw(startText);
         window.draw(quitText);
@@ -96,8 +93,6 @@ int Menu::chooseClass(sf::RenderWindow& window) {
                 window.close();
                 return 0;
             }
-
-            // NIEZAWODNE KLIKNIĘCIE MYSZKĄ
             if (const auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>()) {
                 if (mousePressed->button == sf::Mouse::Button::Left) {
                     sf::Vector2f clickPos = window.mapPixelToCoords(mousePressed->position);
@@ -109,7 +104,7 @@ int Menu::chooseClass(sf::RenderWindow& window) {
             }
         }
 
-        // HOVER
+
         sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
         if (warriorText.getGlobalBounds().contains(mousePos)) warriorText.setFillColor(sf::Color::Yellow);
@@ -121,7 +116,6 @@ int Menu::chooseClass(sf::RenderWindow& window) {
         if (rogueText.getGlobalBounds().contains(mousePos)) rogueText.setFillColor(sf::Color::Yellow);
         else rogueText.setFillColor(sf::Color::White);
 
-        // RYSOWANIE
         window.clear(sf::Color::Black);
         window.draw(titleText);
         window.draw(warriorText);

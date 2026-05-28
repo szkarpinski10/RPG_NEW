@@ -16,7 +16,7 @@ private:
     GUI* gui;
     std::vector<Enemy*> enemies;
     
-
+    //mag kulka
     sf::CircleShape fireball;
     bool isfireballflying = false;
     sf::Vector2f fireballVelocity;

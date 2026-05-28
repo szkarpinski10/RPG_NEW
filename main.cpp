@@ -32,7 +32,7 @@ int main() {
             game.start(window);
         }
 
-        delete player;  // ← main usuwa, bo main tworzył
+        delete player; 
         player = nullptr;
     }
 

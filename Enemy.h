@@ -9,9 +9,8 @@ private:
    
 
 public:
-    Enemy(std::string n, int h, int mH, int ar, int aD,
-          float aR, float aS, int posX, int posY, int expR)
-        : Character(n, h, mH, ar, aD, aR, aS, posX, posY) {
+    Enemy(std::string n, int h, int mH, int ar, int aD,float aR, float aS, int posX, int posY, int expR)
+        :Character(n, h, mH, ar, aD, aR, aS, posX, posY) {
 
         expReward = expR;
     }
@@ -20,6 +19,8 @@ public:
 
     sf::Clock attackClockEnemy;
     sf::Clock enemyMoveClock;
+
+
     void randomMove(Map& map) {
         int dx = 0;
         int dy = 0;
@@ -49,6 +50,6 @@ public:
 }
 
 
- 
+
 };
 

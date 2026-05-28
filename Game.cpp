@@ -10,18 +10,17 @@ Game::Game(Player* p) {
     player = p;
     running = true;
     weaponSprite = nullptr;
+    hud = new HUD(font);
+    gui = new GUI(font);
 
     if (!font.openFromFile("PressStart2P-Regular.ttf")) {
         std::cout << "blad czcionki\n";
     }
     
-    hud = new HUD(font);
-    gui = new GUI(font);
-
     if (!warriorWeaponImg.loadFromFile("LongSword-1.png") ||
         !rogueWeaponImg.loadFromFile("SmallSword.png") ||
         !mageWeaponImg.loadFromFile("Staff4.png")) {
-        std::cout << "blad grafik broni\n";
+        std::cout << "blad grafik broni";
     }
 
     if (player->getName() == "Warrior") {
@@ -39,15 +38,14 @@ Game::Game(Player* p) {
         weaponSprite->setOrigin({wymiaryBroni.size.x / 2.f, wymiaryBroni.size.y});
     }
 
-    // ← PRZENIESIONE TUTAJ, bo weaponSprite jest tworzony WYŻEJ
     gui->setWeaponSprite(weaponSprite);
-    gui->setFireball(&fireball, &isfireballflying);  // ← uważaj na nazwę!
+    gui->setFireball(&fireball, &isfireballflying);
 }
 
 Game::~Game() {
     
     delete hud;
-    delete gui;  // ← DODANE
+    delete gui; 
     delete weaponSprite;
 
     for (Enemy* e : enemies) {
@@ -55,6 +53,7 @@ Game::~Game() {
     }
     enemies.clear();
 }
+
 
 void Game::start(sf::RenderWindow& window) {
     
@@ -80,6 +79,7 @@ void Game::start(sf::RenderWindow& window) {
         e->attackClockEnemy.restart();
         map.placeCharacter(e->getX(), e->getY(), e);
     }
+
     player->resetAbility();
 
     while (running && window.isOpen()) {
@@ -143,7 +143,6 @@ void Game::update(sf::RenderWindow& window) {
         for (Enemy* e : enemies) {
             if (!e->isAlive()) continue;
 
-           
             if (e->enemyMoveClock.getElapsedTime().asSeconds() >= 0.7f) {
             e->randomMove(map);
             e->enemyMoveClock.restart();
@@ -191,7 +190,6 @@ if (fireballPos.x >= enemyPx && fireballPos.x <= enemyPx + 32.f && fireballPos.y
 
     if (!e->isAlive()) {
         player->gainExp(e->getExpReward());
-
         map.removeCharacter(e->getX(), e->getY());
     }
 
@@ -211,6 +209,10 @@ if (fireballPos.x >= enemyPx && fireballPos.x <= enemyPx + 32.f && fireballPos.y
         }
     }
 }
+
+
+
+
 
 //obsluga klawiatury
 
@@ -236,8 +238,7 @@ void Game::handleInput(sf::Keyboard::Key key){
                 playerMoveClock.restart();
             }
         }
-
-// dziwnie zreczy sie tu dzieja do poprawy 
+ 
 
     if (key == sf::Keyboard::Key::E) {
     if (!player->isAbilityUsed()) {
@@ -250,18 +251,23 @@ void Game::handleInput(sf::Keyboard::Key key){
     }
 }
 
+
 void Game::handleMouseClick(sf::Vector2i mousePos, sf::RenderWindow& window) {
     if (!player->isAlive() || !running) {
         return;
     }
 
+    //srodek tile gdzie stoi gracz
     sf::Vector2f playerCenter((player->getX() * 32.f) + 16.f, (player->getY() * 32.f) + 16.f);
 
-    // === LOGIKA MAGA ===
     if (player->getName() == "Mage") {
         if (attackSpeedClock.getElapsedTime().asSeconds() >= player->getAttackSpeed()) {
+
+            //wektor kuernku i dysktansu 
             sf::Vector2f targetPos = window.mapPixelToCoords(mousePos);
             sf::Vector2f dir = targetPos - playerCenter;
+
+            //pitagoras
             float distInPixels = std::sqrt(dir.x * dir.x + dir.y * dir.y);
 
             isfireballflying = true;
@@ -277,7 +283,7 @@ void Game::handleMouseClick(sf::Vector2i mousePos, sf::RenderWindow& window) {
         }
     }
 
-    // === LOGIKA WOJOWNIKA / ŁOTRA ===
+    
     else {
         if (attackSpeedClock.getElapsedTime().asSeconds() >= player->getAttackSpeed()) {
             sf::Vector2f targetPos = window.mapPixelToCoords(mousePos);
@@ -301,7 +307,6 @@ void Game::handleMouseClick(sf::Vector2i mousePos, sf::RenderWindow& window) {
                     e->takeDamage(player->getAttackDamage());
                    
 
-                    // Jesli wrog zginal - daj expa i usun z mapy
                     if (!e->isAlive()) {
                         player->gainExp(e->getExpReward());
                         

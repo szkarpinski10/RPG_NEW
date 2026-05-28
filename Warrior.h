@@ -10,7 +10,7 @@ public:
     Warrior(): Player("Warrior", 120, 120, 8, 20, 5.0f, 1.2f, 1, 1) {}
 
     void specialAbility(std::vector<Enemy*>& enemies, Map& map) override {
-        armor += 5; // Wojownik: bezpośrednio zwiększasz swój pancerz
+        armor += 5; 
         
         for (Enemy* e : enemies) {
             if (e->isAlive()) {
