@@ -1,58 +1,64 @@
 #pragma once
 #include "Character.h"
+#include <vector>
 
 class Enemy;
 class Map;
 
-class Player: public Character{
+/**
+ * @brief Klasa bazowa dla gracza.
+ */
+class Player : public Character {
 protected:
     int level;
     int exp;
     int expToNextLevel;
     bool abilityUsed;
-    bool isBuffed=false;    
 
 public:
+    /**
+     * @brief Tworzy gracza z podanymi statystykami.
+     */
+    Player(std::string n, int h, int mH, int ar, int aD, float aR, float aS, int posX, int posY);
 
-    Player(std::string n, int h, int mH, int ar, int aD, float aR, float aS, int posX, int posY)
-    : Character(n,h,mH,ar,aD,aR,aS,posX,posY){
-        level=1;
-        exp=0;
-        expToNextLevel=100;
-        abilityUsed=false;
-    }
+    /// @brief Zwraca poziom gracza.
+    int getLevel() const { return level; }
 
-    int getLevel() const {return level;}
-    int getExp() const {return exp;}
-    int getExpToNextLevel() const {return expToNextLevel;}
-    bool isAbilityUsed() const { return abilityUsed;}
-    
+    /// @brief Zwraca aktualny exp gracza.
+    int getExp() const { return exp; }
+
+    /// @brief Zwraca ilość expa potrzebną do następnego poziomu.
+    int getExpToNextLevel() const { return expToNextLevel; }
+
+    /// @brief Sprawdza czy umiejętność została użyta.
+    bool isAbilityUsed() const { return abilityUsed; }
+
+    /// @brief Ustawia pozycję X gracza.
     void setX(int newX) { x = newX; }
+
+    /// @brief Ustawia pozycję Y gracza.
     void setY(int newY) { y = newY; }
 
-    void gainExp(int amount) {
-    exp += amount;
-    while (exp >= expToNextLevel) {  
-        exp -= expToNextLevel;      
-        levelUp();
-    }
-}
+    /**
+     * @brief Dodaje exp graczowi.
+     * @param amount ilość zdobytego expa
+     */
+    void gainExp(int amount);
 
-    void levelUp(){
-        level++;
-        expToNextLevel+=200;
-        maxHealth+=20;
-        health=maxHealth;
-        attackDamage+=5;
+    /**
+     * @brief Zwiększa poziom gracza.
+     */
+    void levelUp();
 
-        
-    }
+    /**
+     * @brief Resetuje stan użycia umiejętności specjalnej.
+     */
+    void resetAbility();
 
-    void resetAbility(){
-        abilityUsed=false;
-    }
-
-    virtual void specialAbility(std::vector<Enemy*>& enemies, Map& map)=0;
-   
-
+    /**
+     * @brief Umiejętność specjalna gracza. Polimorfizm
+     * @param enemies lista przeciwników
+     * @param map mapa gry
+     */
+    virtual void specialAbility(std::vector<Enemy*>& enemies, Map& map) = 0;
 };

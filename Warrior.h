@@ -2,22 +2,20 @@
 #include "Player.h"
 #include "Enemy.h"
 
-    
+/**
+ * @brief Klasa wojownika.
+ */
 class Warrior : public Player {
 public:
+    /**
+     * @brief Tworzy wojownika z podstawowymi statystykami.
+     */
+    Warrior();
 
-    // nazwa, zycie, max zycie, armor, attackdamage, attackrange, attackspeed, posx i pos y
-    Warrior(): Player("Warrior", 120, 120, 8, 20, 5.0f, 1.2f, 1, 1) {}
-
-    void specialAbility(std::vector<Enemy*>& enemies, Map& map) override {
-        armor += 5; 
-        
-        for (Enemy* e : enemies) {
-            if (e->isAlive()) {
-                e->takeDamage(20); 
-            }
-        }
-        abilityUsed = true;
-        
-    }
+    /**
+     * @brief Umiejętność specjalna wojownika.
+     * @param enemies lista przeciwników
+     * @param map mapa gry
+     */
+    void specialAbility(std::vector<Enemy*>& enemies, Map& map) override;
 };

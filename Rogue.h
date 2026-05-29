@@ -2,19 +2,20 @@
 #include "Player.h"
 #include "Enemy.h"
 
-
-
+/**
+ * @brief Klasa łotra.
+ */
 class Rogue : public Player {
 public:
-    // nazwa, zycie, max zycie, armor, attackdamage, attackrange, attackspeed, posx i pos y
-    Rogue(): Player("Rogue", 100, 90, 4, 15, 4.0f, 0.5f, 1, 1) {}
+    /**
+     * @brief Tworzy łotra z podstawowymi statystykami.
+     */
+    Rogue();
 
-    void specialAbility(std::vector<Enemy*>& enemies, Map& map) override {
-        
-        attackDamage += 7;   
-        attackSpeed += 0.5f;  
-        
-        abilityUsed = true;   
-       
-    }
+    /**
+     * @brief Umiejętność specjalna łotra.
+     * @param enemies lista przeciwników
+     * @param map mapa gry
+     */
+    void specialAbility(std::vector<Enemy*>& enemies, Map& map) override;
 };
